@@ -46,7 +46,7 @@ namespace AppRelojChecadorCurso
             //Obtencion del numero total de marcajes del reloj checador
 
             //Realizar conexion
-            dispositivo.DispositivoConectar(Convert.ToString(ip), 1, false);
+          //  dispositivo.DispositivoConectar(Convert.ToString(ip), 1, false);
             dispositivo.DispositivoConsultar(NumeroDe.RegistrosDeAsistencias);
             nmarcajes = dispositivo.ResultadoConsulta;
 
@@ -593,6 +593,8 @@ namespace AppRelojChecadorCurso
                 }
             }
         }
+
+
 
         public void desconectar()
         {
