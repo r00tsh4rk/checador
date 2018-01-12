@@ -89,107 +89,27 @@ namespace AppRelojChecadorCurso
             {
                 try
                 { 
-                if (dispositivo.DispositivoObtenerRegistrosAsistencias())
-                {
-                    for (int i = (dispositivo.ListaMarcajes.Count - 1); i >= 0; i--)
+                    if (dispositivo.DispositivoObtenerRegistrosAsistencias())
                     {
-                        //Datos a consultar del reloj checador
-                        modelo.Numcredencial = dispositivo.ListaMarcajes[i].NumeroCredencial.ToString();
-                        modelo.Horac = dispositivo.ListaMarcajes[i].Hora.ToString() + ":" + dispositivo.ListaMarcajes[i].Minuto.ToString() + ":" + dispositivo.ListaMarcajes[i].Segundo.ToString();
-                        modelo.Fecha = dispositivo.ListaMarcajes[i].Anio.ToString() + "-" + dispositivo.ListaMarcajes[i].Mes.ToString() + "-" + dispositivo.ListaMarcajes[i].Dia.ToString();
-
-                        //Si la base de datos se encuentra vacia, se realiza la insercion del priemer dato, de esa manera llenara la abse con los
-                        //registros que tenga pendiente por subir el reloj checador 
-
-                        if (cant == 0)
+                        for (int i = (dispositivo.ListaMarcajes.Count - 1); i >= 0; i--)
                         {
-                            // Validar que no haya mas de un marcaje
+                            //Datos a consultar del reloj checador
+                            modelo.Numcredencial = dispositivo.ListaMarcajes[i].NumeroCredencial.ToString();
+                            modelo.Horac = dispositivo.ListaMarcajes[i].Hora.ToString() + ":" + dispositivo.ListaMarcajes[i].Minuto.ToString() + ":" + dispositivo.ListaMarcajes[i].Segundo.ToString();
+                            modelo.Fecha = dispositivo.ListaMarcajes[i].Anio.ToString() + "-" + dispositivo.ListaMarcajes[i].Mes.ToString() + "-" + dispositivo.ListaMarcajes[i].Dia.ToString();
 
-                            //Console.WriteLine("Llenado incial de la base de datos");
+                            //Si la base de datos se encuentra vacia, se realiza la insercion del priemer dato, de esa manera llenara la abse con los
+                            //registros que tenga pendiente por subir el reloj checador 
 
-                            // comenzar validacion
-                            string insert;
-
-                            int hh = Convert.ToInt32(modelo.Horac.Substring(0, 1));
-
-                            if (hh >= 6 && hh <= 9)
+                            if (cant == 0)
                             {
-                                tipo_marcaje = 0; //entrada
-                                insert = "Insert into asistencias_mapeo(id_credencial,hora,fecha,dispositivo,tipo_marcaje) values('" + modelo.Numcredencial + "','" + modelo.Horac +
-                              "','" + modelo.Fecha + "','" + Convert.ToString(ip) + "','" + tipo_marcaje + "');";
+                                // Validar que no haya mas de un marcaje
 
-                                //Creamos la conexión a la base de datos
-                                MySqlConnection _conexion = new MySqlConnection();
-                                _conexion.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
-                                _conexion.Open();
-                                //Se muestra un mensaje de Asistencia Agregada
-                                MySqlCommand C = new MySqlCommand(insert, _conexion);
-                                MySqlDataReader lector;
-                                lector = C.ExecuteReader();
-                                //Console.WriteLine("Entrada registrada");
-                                _conexion.Close();
-                            }
+                                //Console.WriteLine("Llenado incial de la base de datos");
 
-                            else
-                            {
-                                tipo_marcaje = 1; //salida
-                                insert = "Insert into asistencias_mapeo(id_credencial,hora,fecha,dispositivo,tipo_marcaje) values('" + modelo.Numcredencial + "','" + modelo.Horac +
-                              "','" + modelo.Fecha + "','" + Convert.ToString(ip) + "','" + tipo_marcaje + "');";
-
-                                //Creamos la conexión a la base de datos
-                                MySqlConnection _conexion = new MySqlConnection();
-                                _conexion.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
-                                _conexion.Open();
-                                //Se muestra un mensaje de Asistencia Agregada
-                                MySqlCommand C = new MySqlCommand(insert, _conexion);
-                                MySqlDataReader lector;
-                                lector = C.ExecuteReader();
-                               // Console.WriteLine("Salida Registrada");
-                                _conexion.Close();
-                            }
-
-
-                            string consultaUltimo0 = "SELECT * FROM asistencias_mapeo WHERE dispositivo='" + Convert.ToString(ip) + "' ORDER BY id_asistencia DESC, hora DESC LIMIT 1;";
-                            MySqlConnection _conn0 = new MySqlConnection();
-                            _conn0.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
-                            _conn0.Open();
-                            //Se muestra un mensaje de Asistencia Agregada
-                            MySqlCommand Con0 = new MySqlCommand(consultaUltimo0, _conn0);
-                            MySqlDataReader Readern;
-                            Readern = Con0.ExecuteReader();
-
-                            //Obtengo el ultimo registro de entrada de la  base de datos
-                            while (Readern.Read())
-                            {
-                                idasistencia = Readern["id_asistencia"].ToString();
-                                idcredencial = Readern["id_credencial"].ToString();
-                                horac = Readern["hora"].ToString();
-                                fechac = Readern["fecha"].ToString();
-
-                            }
-                            _conn0.Close();
-
-                        }
-                        else
-                        //Cuando la base de datos tiene registros entonces comenzamos la comparacion 
-                        //Compara si los marcajes son mayores a la cantidad de registros en labase de datos entonces inicia el proceso de insercion
-                        if (nmarcajes > cant)
-                        {
-
-
-                            //Si la hora y fecha del ultimo registro de la bd es igual a la hora y fehca del ultimo registro del checador
-                            // Ya no hay mas entradas o asistencias por registrar 
-                            if (horac.Equals(modelo.Horac) == true && fechac.Equals(modelo.Fecha) == true)
-                            {
-                              //  Console.WriteLine("No se han detectado entradas al reloj checador");
-                                break;
-                            }
-                            else
-                            {
-                                //Console.WriteLine("Se he detectado una nueva entrada al reloj checador");
-                                //Creamos la cadena sql a ejecutar la inserción de los marcajes
-
+                                // comenzar validacion
                                 string insert;
+
                                 int hh = Convert.ToInt32(modelo.Horac.Substring(0, 1));
 
                                 if (hh >= 6 && hh <= 9)
@@ -206,12 +126,8 @@ namespace AppRelojChecadorCurso
                                     MySqlCommand C = new MySqlCommand(insert, _conexion);
                                     MySqlDataReader lector;
                                     lector = C.ExecuteReader();
-                                   // Console.WriteLine("Entrada agregada a la base de datos con el id: " + modelo.Numcredencial);
+                                    //Console.WriteLine("Entrada registrada");
                                     _conexion.Close();
-                                    cant++;
-                                    /*Si ocurre un problema con la maquina o esta apagada, todos los marcajes pendientes por agregar
-                                     * a la base de datos, se agregaran en cuanto haya conexion con la bd
-                                     */
                                 }
 
                                 else
@@ -228,110 +144,197 @@ namespace AppRelojChecadorCurso
                                     MySqlCommand C = new MySqlCommand(insert, _conexion);
                                     MySqlDataReader lector;
                                     lector = C.ExecuteReader();
-                                  //  Console.WriteLine("Entrada agregada a la base de datos con el id: " + modelo.Numcredencial);
+                                   // Console.WriteLine("Salida Registrada");
                                     _conexion.Close();
-                                    cant++;
-                                    /*Si ocurre un problema con la maquina o esta apagada, todos los marcajes pendientes por agregar
-                                     * a la base de datos, se agregaran en cuanto haya conexion con la bd
-                                     */
                                 }
 
-                                if (cant == nmarcajes)
+
+                                string consultaUltimo0 = "SELECT * FROM asistencias_mapeo WHERE dispositivo='" + Convert.ToString(ip) + "' ORDER BY id_asistencia DESC, hora DESC LIMIT 1;";
+                                MySqlConnection _conn0 = new MySqlConnection();
+                                _conn0.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
+                                _conn0.Open();
+                                //Se muestra un mensaje de Asistencia Agregada
+                                MySqlCommand Con0 = new MySqlCommand(consultaUltimo0, _conn0);
+                                MySqlDataReader Readern;
+                                Readern = Con0.ExecuteReader();
+
+                                //Obtengo el ultimo registro de entrada de la  base de datos
+                                while (Readern.Read())
                                 {
-                                   // Console.WriteLine("Se han insertado todas las asistencias pendientes a la base de datos ");
-                                    break;
+                                    idasistencia = Readern["id_asistencia"].ToString();
+                                    idcredencial = Readern["id_credencial"].ToString();
+                                    horac = Readern["hora"].ToString();
+                                    fechac = Readern["fecha"].ToString();
+
                                 }
-                            }
+                                _conn0.Close();
 
-                        }
-                        else
-                        if (cant > nmarcajes)
-                        {
-
-                            string consultaUltimo0 = "SELECT * FROM asistencias_mapeo WHERE dispositivo='" + Convert.ToString(ip) + "' ORDER BY id_asistencia DESC, hora DESC LIMIT 1;";
-                            MySqlConnection _conn0 = new MySqlConnection();
-                            _conn0.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
-                            _conn0.Open();
-                            //Se muestra un mensaje de Asistencia Agregada
-                            MySqlCommand Con0 = new MySqlCommand(consultaUltimo0, _conn0);
-                            MySqlDataReader Readern;
-                            Readern = Con0.ExecuteReader();
-
-                            //Obtengo el ultimo registro de entrada de la  base de datos
-                            while (Readern.Read())
-                            {
-                                idasistencia = Readern["id_asistencia"].ToString();
-                                idcredencial = Readern["id_credencial"].ToString();
-                                horac = Readern["hora"].ToString();
-                                fechac = Readern["fecha"].ToString();
-
-                            }
-                            _conn0.Close();
-
-                            if (horac.Equals(modelo.Horac))
-                            {
-                                //Console.WriteLine("Son iguales, no hay registros");
-                                break;
                             }
                             else
+                            //Cuando la base de datos tiene registros entonces comenzamos la comparacion 
+                            //Compara si los marcajes son mayores a la cantidad de registros en labase de datos entonces inicia el proceso de insercion
+                            if (nmarcajes > cant)
                             {
-                               // Console.WriteLine("No son iguales");
-                                //Creamos la cadena sql a ejecutar la inserción de los marcajes
-                                string insert;
-                                int hh = Convert.ToInt32(modelo.Horac.Substring(0, 1));
 
-                                if (hh >= 6 && hh <= 9)
+
+                                //Si la hora y fecha del ultimo registro de la bd es igual a la hora y fehca del ultimo registro del checador
+                                // Ya no hay mas entradas o asistencias por registrar 
+                                if (horac.Equals(modelo.Horac) == true && fechac.Equals(modelo.Fecha) == true)
                                 {
-                                    tipo_marcaje = 0; //entrada
-                                    insert = "Insert into asistencias_mapeo(id_credencial,hora,fecha,dispositivo,tipo_marcaje) values('" + modelo.Numcredencial + "','" + modelo.Horac +
-                                  "','" + modelo.Fecha + "','" + Convert.ToString(ip) + "','" + tipo_marcaje + "');";
-
-                                    //Creamos la conexión a la base de datos
-                                    MySqlConnection _conexion = new MySqlConnection();
-                                    _conexion.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
-                                    _conexion.Open();
-                                    //Se muestra un mensaje de Asistencia Agregada
-                                    MySqlCommand C = new MySqlCommand(insert, _conexion);
-                                    MySqlDataReader lector;
-                                    lector = C.ExecuteReader();
-                                   // Console.WriteLine("Asistencia Agregada");
-                                    _conexion.Close();
-                                    //cant++;
-
-                                    //Console.WriteLine("Se han insertado todos los marcajes restantes ");
+                                  //  Console.WriteLine("No se han detectado entradas al reloj checador");
                                     break;
                                 }
                                 else
                                 {
-                                    tipo_marcaje = 1; //entrada
-                                    insert = "Insert into asistencias_mapeo(id_credencial,hora,fecha,dispositivo,tipo_marcaje) values('" + modelo.Numcredencial + "','" + modelo.Horac +
-                                  "','" + modelo.Fecha + "','" + Convert.ToString(ip) + "','" + tipo_marcaje + "');";
+                                    //Console.WriteLine("Se he detectado una nueva entrada al reloj checador");
+                                    //Creamos la cadena sql a ejecutar la inserción de los marcajes
 
-                                    //Creamos la conexión a la base de datos
-                                    MySqlConnection _conexion = new MySqlConnection();
-                                    _conexion.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
-                                    _conexion.Open();
-                                    //Se muestra un mensaje de Asistencia Agregada
-                                    MySqlCommand C = new MySqlCommand(insert, _conexion);
-                                    MySqlDataReader lector;
-                                    lector = C.ExecuteReader();
-                                   // Console.WriteLine("Asistencia Agregada");
-                                    _conexion.Close();
-                                    //cant++;
+                                    string insert;
+                                    int hh = Convert.ToInt32(modelo.Horac.Substring(0, 1));
 
-                                   // Console.WriteLine("Se han insertado todos los marcajes restantes ");
+                                    if (hh >= 6 && hh <= 9)
+                                    {
+                                        tipo_marcaje = 0; //entrada
+                                        insert = "Insert into asistencias_mapeo(id_credencial,hora,fecha,dispositivo,tipo_marcaje) values('" + modelo.Numcredencial + "','" + modelo.Horac +
+                                      "','" + modelo.Fecha + "','" + Convert.ToString(ip) + "','" + tipo_marcaje + "');";
+
+                                        //Creamos la conexión a la base de datos
+                                        MySqlConnection _conexion = new MySqlConnection();
+                                        _conexion.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
+                                        _conexion.Open();
+                                        //Se muestra un mensaje de Asistencia Agregada
+                                        MySqlCommand C = new MySqlCommand(insert, _conexion);
+                                        MySqlDataReader lector;
+                                        lector = C.ExecuteReader();
+                                       // Console.WriteLine("Entrada agregada a la base de datos con el id: " + modelo.Numcredencial);
+                                        _conexion.Close();
+                                        cant++;
+                                        /*Si ocurre un problema con la maquina o esta apagada, todos los marcajes pendientes por agregar
+                                         * a la base de datos, se agregaran en cuanto haya conexion con la bd
+                                         */
+                                    }
+
+                                    else
+                                    {
+                                        tipo_marcaje = 1; //salida
+                                        insert = "Insert into asistencias_mapeo(id_credencial,hora,fecha,dispositivo,tipo_marcaje) values('" + modelo.Numcredencial + "','" + modelo.Horac +
+                                      "','" + modelo.Fecha + "','" + Convert.ToString(ip) + "','" + tipo_marcaje + "');";
+
+                                        //Creamos la conexión a la base de datos
+                                        MySqlConnection _conexion = new MySqlConnection();
+                                        _conexion.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
+                                        _conexion.Open();
+                                        //Se muestra un mensaje de Asistencia Agregada
+                                        MySqlCommand C = new MySqlCommand(insert, _conexion);
+                                        MySqlDataReader lector;
+                                        lector = C.ExecuteReader();
+                                      //  Console.WriteLine("Entrada agregada a la base de datos con el id: " + modelo.Numcredencial);
+                                        _conexion.Close();
+                                        cant++;
+                                        /*Si ocurre un problema con la maquina o esta apagada, todos los marcajes pendientes por agregar
+                                         * a la base de datos, se agregaran en cuanto haya conexion con la bd
+                                         */
+                                    }
+
+                                    if (cant == nmarcajes)
+                                    {
+                                       // Console.WriteLine("Se han insertado todas las asistencias pendientes a la base de datos ");
+                                        break;
+                                    }
+                                }
+
+                            }
+                            else
+                            if (cant > nmarcajes)
+                            {
+
+                                string consultaUltimo0 = "SELECT * FROM asistencias_mapeo WHERE dispositivo='" + Convert.ToString(ip) + "' ORDER BY id_asistencia DESC, hora DESC LIMIT 1;";
+                                MySqlConnection _conn0 = new MySqlConnection();
+                                _conn0.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
+                                _conn0.Open();
+                                //Se muestra un mensaje de Asistencia Agregada
+                                MySqlCommand Con0 = new MySqlCommand(consultaUltimo0, _conn0);
+                                MySqlDataReader Readern;
+                                Readern = Con0.ExecuteReader();
+
+                                //Obtengo el ultimo registro de entrada de la  base de datos
+                                while (Readern.Read())
+                                {
+                                    idasistencia = Readern["id_asistencia"].ToString();
+                                    idcredencial = Readern["id_credencial"].ToString();
+                                    horac = Readern["hora"].ToString();
+                                    fechac = Readern["fecha"].ToString();
+
+                                }
+                                _conn0.Close();
+
+                                if (horac.Equals(modelo.Horac))
+                                {
+                                    //Console.WriteLine("Son iguales, no hay registros");
                                     break;
                                 }
-                            }
+                                else
+                                {
+                                   // Console.WriteLine("No son iguales");
+                                    //Creamos la cadena sql a ejecutar la inserción de los marcajes
+                                    string insert;
+                                    int hh = Convert.ToInt32(modelo.Horac.Substring(0, 1));
 
+                                    if (hh >= 6 && hh <= 9)
+                                    {
+                                        tipo_marcaje = 0; //entrada
+                                        insert = "Insert into asistencias_mapeo(id_credencial,hora,fecha,dispositivo,tipo_marcaje) values('" + modelo.Numcredencial + "','" + modelo.Horac +
+                                      "','" + modelo.Fecha + "','" + Convert.ToString(ip) + "','" + tipo_marcaje + "');";
+
+                                        //Creamos la conexión a la base de datos
+                                        MySqlConnection _conexion = new MySqlConnection();
+                                        _conexion.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
+                                        _conexion.Open();
+                                        //Se muestra un mensaje de Asistencia Agregada
+                                        MySqlCommand C = new MySqlCommand(insert, _conexion);
+                                        MySqlDataReader lector;
+                                        lector = C.ExecuteReader();
+                                       // Console.WriteLine("Asistencia Agregada");
+                                        _conexion.Close();
+                                        //cant++;
+
+                                        //Console.WriteLine("Se han insertado todos los marcajes restantes ");
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        tipo_marcaje = 1; //entrada
+                                        insert = "Insert into asistencias_mapeo(id_credencial,hora,fecha,dispositivo,tipo_marcaje) values('" + modelo.Numcredencial + "','" + modelo.Horac +
+                                      "','" + modelo.Fecha + "','" + Convert.ToString(ip) + "','" + tipo_marcaje + "');";
+
+                                        //Creamos la conexión a la base de datos
+                                        MySqlConnection _conexion = new MySqlConnection();
+                                        _conexion.ConnectionString = "Data Source=" + servidor + "; Database=" + baseDatos + "; Uid=" + usuario + "; Pwd=" + password;
+                                        _conexion.Open();
+                                        //Se muestra un mensaje de Asistencia Agregada
+                                        MySqlCommand C = new MySqlCommand(insert, _conexion);
+                                        MySqlDataReader lector;
+                                        lector = C.ExecuteReader();
+                                       // Console.WriteLine("Asistencia Agregada");
+                                        _conexion.Close();
+                                        //cant++;
+
+                                       // Console.WriteLine("Se han insertado todos los marcajes restantes ");
+                                        break;
+                                    }
+                                }
+
+                            }
+                            else
+                            {
+                               // Console.WriteLine("No se han registrado asistencias");
+                                break;
+                            }
                         }
-                        else
-                        {
-                           // Console.WriteLine("No se han registrado asistencias");
-                            break;
-                        }
+
+                            dispositivo.DispositivoDesconectar();
                     }
-                }
+
                 }
                 catch(Exception ex)
                 {
@@ -348,6 +351,7 @@ namespace AppRelojChecadorCurso
         
             finally
             {
+
                 if (dispositivo.DispositivoObtenerRegistrosAsistencias())
                 {
                     for (int i = (dispositivo.ListaMarcajes.Count - 1); i >= 0; i--)
@@ -590,6 +594,8 @@ namespace AppRelojChecadorCurso
                             break;
                         }
                     }
+
+                    dispositivo.DispositivoDesconectar();
                 }
             }
         }

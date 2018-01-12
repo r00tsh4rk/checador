@@ -32,6 +32,7 @@ namespace AppRelojChecadorCurso
            
         }
 
+       
         private void Form1_Load(object sender, EventArgs e)
         {
             mostrar();
@@ -54,9 +55,15 @@ namespace AppRelojChecadorCurso
             Console.WriteLine(" IP´s encontradas en la BD: '" + cant + "'" + "\n");
             _con.Close();
             //creamos los hilos
-            hilos = new Thread[cant];
+         //   hilos = new Thread[cant];
 
         }
+
+        private void Form1_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            Application.ExitThread();
+        }
+
 
         private void dataGridView1_CellClick(object sender, DataGridViewCellEventArgs e)
         {           
