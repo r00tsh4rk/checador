@@ -7,6 +7,7 @@ using ZKSoftwareAPI;
 using MySql.Data;
 using MySql.Data.MySqlClient;
 using System.Windows.Forms;
+using zkemkeeper;
 
 namespace AppRelojChecadorCurso
 {
@@ -19,6 +20,8 @@ namespace AppRelojChecadorCurso
         string password = "";
         String idcredencial, horac, fechac, idasistencia;
         int tipo_marcaje;
+        public ZkemClient objZkeeper;
+
 
         public void proceso_cseiio(Object ip)
         {
@@ -338,7 +341,8 @@ namespace AppRelojChecadorCurso
                 }
                 catch(Exception ex)
                 {
-                    MessageBox.Show("Los checadores requieren reinicio de mantenimiento, para seguir funcionando ", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information); 
+                    objZkeeper.RestartDevice(1);
+                    //MessageBox.Show("Los checadores requieren reinicio de mantenimiento, para seguir funcionando ", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information); 
                     Application.Exit();
                 }
             }
